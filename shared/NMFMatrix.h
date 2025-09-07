@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "../../Eigen/Core"
+#include <Eigen/Core>
 #include "ProbFunc.h"
 #include "FixedPF.h"
 #include "PointerSupport.h"

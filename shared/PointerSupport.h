@@ -1,7 +1,7 @@
 #ifndef POINTERSUPPORT__H
 #define POINTERSUPPORT__H
 #include "ProbFunc.h"
-#include "../../Eigen/Core"
+#include <Eigen/Core>
 
 namespace Eigen {
 	template<> struct NumTraits<ProbFunc*>

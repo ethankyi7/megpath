@@ -21,7 +21,7 @@ class FlipOMPMonteAnneal:public MonteAnneal{
 		virtual double monteCarlo();
 		virtual double anneal();
 	protected:
-		vector<vector<int>> ranges;
+		vector<Range> ranges;
 		State * dupe;
 		int numThreads;
 };

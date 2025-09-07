@@ -1,7 +1,8 @@
 CC=g++
-CFLAGS=-O3 -c -std=c++11 -Wfatal-errors -Werror
+INCLUDES = -I./
+CFLAGS=-O3 -c -std=c++11 -Wfatal-errors -Werror ${INCLUDES}
 LDFLAGS= 
-LIBS=-lpng
+LIBS=-lz -lpng
 SOURCES=CmdArgs.cpp Stopwatch.cpp PiecewisePF.cpp MonteAnneal.cpp MonteDebug.cpp ErrorFunctionCol.cpp ErrorFunctionRow.cpp ErrorFunction.cpp Analysis.cpp Value.cpp State.cpp HybridPF.cpp NMFMatrix.cpp FileUtil.cpp ArgFile.cpp FixedPF.cpp NormalPF.cpp ShiftPF.cpp CSVFile.cpp HistoPF.cpp ProbFunc.cpp UniformPF.cpp WeightedPF.cpp PNG.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 LIBRARY=libnmf.a

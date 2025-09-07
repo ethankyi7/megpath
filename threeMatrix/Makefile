@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-O3 -c -lpthread -std=c++11 -Wfatal-errors -Werror -I ../shared
 LDFLAGS= -L ../shared/ 
-LIBS=-lnmf
+LIBS=-lnmf -lpng
 SOURCES= main.cpp ThreeAnalysis.cpp ThreeState.cpp ThreeMonteAnneal.cpp ThreeErrorFunction.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 LIBRARY=lib3nmf.a

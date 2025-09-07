@@ -22,7 +22,8 @@ void FlipOMPMonteAnneal::monteCarloThreadCoefficient(){
 	//For each spot take a gamble and record outcome
 	for(int i = 0; i < state->MAX_RUNS; i++){
 		int id = omp_get_thread_num();
-		monteCarloStep(state->coefficients,&efRow,0,state->coefficients.columns(),ranges[id][2],ranges[id][3]);
+
+		monteCarloStep(state->coefficients,&efRow,ranges[id]);
 	 	#pragma omp barrier
 		//wait for Pattern thread to Exchange the coefficients/Patterns
 	 	#pragma omp barrier
@@ -109,7 +110,8 @@ void FlipOMPMonteAnneal::annealThreadCoefficient(int num, double tstart, double 
     //For each spot take a gamble and record outcome
     for(int i =num; i < 2*state->MAX_RUNS; i++){
 	
-	annealStep(state->coefficients,t,&efRow,0,state->coefficients.columns(),ranges[id][2],ranges[id][3]);
+
+	annealStep(state->coefficients,t,&efRow,ranges[id]);
 	#pragma omp barrier
 	    //wait for Pattern thread to exchange coefficients/rows
 	#pragma omp barrier

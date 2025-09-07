@@ -31,34 +31,33 @@ void State::reset()
 	coefficients.reset();
 }
 
-/*vector<vector<int>> State::splitRanges(int by)
-  {
-  int rowSize = coefficients.rows/by;
-  int colSize = patterns.columns/by;
-  int rowStart = 0;
-  int colStart = 0;
+vector<Range> State::splitRanges(int by) {
+	int rowSize = coefficients.rows()/by;
+	int colSize = patterns.columns()/by;
+	int rowStart = 0;
+	int colStart = 0;
 
-  vector<vector<int>> rv;
+	vector<Range> rv;
 
-  for(int i =0; i < by; ++i){
-  int rowEnd = rowStart + rowSize;
-  int colEnd = colStart + colSize;
-  if(i < coefficients.rows%by)
-  rowEnd += 1;
-  if(i < patterns.columns%by)
-  colEnd += 1;
-  vector<int> tmp;
-  tmp.push_back(colStart);
-  tmp.push_back(colEnd);
-  tmp.push_back(rowStart);
-  tmp.push_back(rowEnd);
-  rv.push_back(tmp);
+	for(int i =0; i < by; ++i){
+		int rowEnd = rowStart + rowSize - 1;
+		int colEnd = colStart + colSize - 1;
+		if(i < coefficients.rows()%by) rowEnd += 1;
+		if(i < patterns.columns()%by) colEnd += 1;
 
-  rowStart = rowEnd;
-  colStart = colEnd;
-  }
+		Range tmp;
+		tmp.colStart = colStart;
+		tmp.colEnd = colEnd;
+		tmp.rowStart = rowStart;
+		tmp.rowEnd = rowEnd;
+		rv.push_back(tmp);
+
+		rowStart = rowEnd + 1;
+		colStart = colEnd + 1;
+  	}
+
   return rv;
-  }*/
+  }
 
 
 

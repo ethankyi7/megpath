@@ -20,7 +20,7 @@ double ThreeMonteAnneal::monteCarlo(){
 		}
 		monteCarloStep(state->coefficients,&ef);
 		monteCarloStep(state->weights, &ef);
-		if(i % state->interuptRuns == 0 && callback != NULL){
+		if(i % state->interruptRuns == 0 && callback != NULL){
 			callback->monteCallback(i);
 		}
 		if(i % state->printRuns == 0 && callback != NULL){
@@ -49,7 +49,7 @@ double ThreeMonteAnneal::anneal(){
 			annealStep(state->patterns,t,&ef);
 		}
 		annealStep(state->weights,t,&ef);
-		if(ndx % state->interuptRuns == 0 && callback != NULL){
+		if(ndx % state->interruptRuns == 0 && callback != NULL){
 			running = callback->annealCallback(ndx);
 		}
 		if(ndx % state->printRuns == 0 && callback != NULL){

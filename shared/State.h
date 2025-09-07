@@ -12,7 +12,7 @@
 #include "ArgFile.h"
 #include "CSVFile.h"
 #include "NMFMatrix.h"
-#include "../../Eigen/Core"
+#include  <Eigen/Core>
 #include "ShiftPF.h"
 #include "WeightedPF.h"
 #include "PiecewisePF.h"
@@ -51,7 +51,7 @@ class State{
 		double start_prob;
 		double end_prob;
 		virtual bool load(string argFileName);
-		//vector<vector<int> > splitRanges(int by)
+		vector<Range> splitRanges(int by);
 		Range getRange(int rank);
 		double calcT();
 		double calcAlpha(double t);

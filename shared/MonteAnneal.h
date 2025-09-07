@@ -16,7 +16,7 @@
 #include "ErrorFunctionCol.h"
 #include "FileUtil.h"
 #include "Observer.h"
-#include "../../Eigen/Core"
+#include <Eigen/Core>
 
 using namespace std;
 class MonteAnneal{

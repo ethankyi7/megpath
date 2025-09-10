@@ -6,7 +6,7 @@
 #include <iostream>
 #include <random>
 #include <fstream>
-#include "../../../Eigen/Core"
+#include <Eigen/Core>
 
 using namespace std;
 using namespace Eigen;
@@ -70,6 +70,7 @@ int main(){
 	outfile << "test_origin = [0,0]\n";
 	outfile << "test_directory = \"results\"\n";
 	outfile << "test_columns = [0,1,2,3,4]\n";
+	//outfile << "test_controls = [0, 0, 0, 0, 0]\n";
 	outfile << "patternOne = [0.1,0.35,0.5,0.65,0.8]\n";
 	outfile.close();
 

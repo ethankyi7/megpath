@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-O3 -c -fopenmp -std=c++11 -I../shared/
 LDFLAGS=-L../shared/ -fopenmp
-LIBS=-lpthread -lnmf -fopenmp
+LIBS=-lpthread -lnmf -fopenmp -lpng
 LIB_SOURCES=FlipOMPMonteAnneal.cpp OMPMonteAnneal.cpp
 SOURCES=$(LIB_SOURCES) main.cpp
 LIB_OBJECTS=$(LIB_SOURCES:.cpp=.o)

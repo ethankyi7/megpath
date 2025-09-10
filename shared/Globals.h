@@ -8,7 +8,7 @@
 */
 #include <iostream>
 #include <cmath>
-#include "../../Eigen/Core"
+#include <Eigen/Core>
 #include "NMFMatrix.h"
 #include "ProbFunc.h"
 #include "UniformPF.h"

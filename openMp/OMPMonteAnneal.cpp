@@ -20,10 +20,20 @@ void OMPMonteAnneal::monteCarloThread(int xStart, int xEnd,int yStart,int yEnd){
 	
 	//For each spot take a gamble and record outcome
 	for(int i =0; i < state->MAX_RUNS; i++){
-		monteCarloStep(state->coefficients,&efRow,0,state->coefficients.columns,yStart,yEnd);
+		Range r;
+		r.colStart = 0;
+		r.colEnd = state->coefficients.columns();
+		r.rowStart = yStart;
+		r.rowEnd = yEnd;
+		monteCarloStep(state->coefficients,&efRow,r);
         	if(state->both){
 			#pragma omp barrier
-        		monteCarloStep(state->patterns,&efCol,xStart,xEnd,0,state->patterns.rows);
+				Range s;
+				s.colStart = xStart;
+				s.colEnd = xEnd;
+				r.rowStart = 0;
+				s.rowEnd = state->patterns.rows();
+        		monteCarloStep(state->patterns,&efCol,s);
         	}
 		#pragma omp barrier
 		#pragma omp master
@@ -31,7 +41,7 @@ void OMPMonteAnneal::monteCarloThread(int xStart, int xEnd,int yStart,int yEnd){
         	if(i % state->printRuns == 0 && callback != NULL){
 			callback->montePrintCallback(i);
         	}
-			if(i % state->interuptRuns == 0){
+			if(i % state->interruptRuns == 0){
 				if(callback != NULL){
 					callback->monteCallback(i);
 				}
@@ -46,16 +56,16 @@ double OMPMonteAnneal::monteCarlo(){
     Stopwatch watch;
 	watch.start();
 	
-	vector<vector<int>> ranges = state->splitRanges(numThreads);
+	vector<Range> ranges = state->splitRanges(numThreads);
 
 	int id;
 	#pragma omp parallel private(id) num_threads(numThreads)
 	{
 		id = omp_get_thread_num();
 		if(state->constrained){
-            ranges[id][1] = (id == 0 ? state->patterns.columns : 0);
+            ranges[id].colEnd = (id == 0 ? state->patterns.columns() : 0);
         }  
-		monteCarloThread(ranges[id][0],ranges[id][1],ranges[id][2],ranges[id][3]);
+		monteCarloThread(ranges[id].colStart,ranges[id].colEnd,ranges[id].rowStart,ranges[id].rowEnd);
 	}
 
 	ErrorFunctionRow efRow(state);
@@ -76,15 +86,25 @@ void OMPMonteAnneal::annealThread(int xStart, int xEnd,int yStart,int yEnd){
 
     //For each spot take a gamble and record outcome
     for(int i =0; i < 2*state->MAX_RUNS; i++){
-		annealStep(state->coefficients,t,&efRow,0,state->coefficients.columns,yStart,yEnd);
+		Range r;
+		r.colStart = 0;
+		r.colEnd = state->coefficients.columns();
+		r.rowStart = yStart;
+		r.rowEnd = yEnd;
+		annealStep(state->coefficients,t,&efRow,r);
         if(state->both){
 			#pragma omp barrier
-			annealStep(state->patterns,t,&efCol,xStart,xEnd,0,state->patterns.rows);
+			Range s;
+			s.colStart = xStart;
+			s.colEnd = xEnd;
+			s.rowStart = 0;
+			s.rowEnd = state->patterns.rows();
+			annealStep(state->patterns,t,&efCol,s);
 		}
 		#pragma omp barrier
 		#pragma omp master
 		{
-			if(i % state->interuptRuns == 0 && callback != NULL){
+			if(i % state->interruptRuns == 0 && callback != NULL){
 				callback->annealCallback(i);
 			}
 
@@ -101,16 +121,16 @@ double OMPMonteAnneal::anneal(){
 	Stopwatch watch;
 	watch.start();
 	
-	vector<vector<int>> ranges = state->splitRanges(numThreads);
+	vector<Range> ranges = state->splitRanges(numThreads);
 	int id;
 	#pragma omp parallel private(id) num_threads(numThreads)
 	{
 		id = omp_get_thread_num();
 		if(state->constrained){
-			ranges[id][0] = 0;
-			ranges[id][1] = (id == 0 ? state->patterns.columns : 0);
+			ranges[id].colStart = 0;
+			ranges[id].colEnd = (id == 0 ? state->patterns.columns() : 0);
 		}
-        annealThread(ranges[id][0],ranges[id][1],ranges[id][2],ranges[id][3]);
+        annealThread(ranges[id].colStart,ranges[id].colEnd,ranges[id].rowStart,ranges[id].rowEnd);
 	}
 
 	ErrorFunctionRow efRow(state);

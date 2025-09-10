@@ -132,9 +132,15 @@ void Analysis::monteFinalCallback(){
 // put it in here 
 
 void Analysis::montePrintCallback(int iterations){
-    //needs time
-    ErrorFunctionRow ef(state);
-	cachedError = ef.error();
+  //needs time
+  ErrorFunctionRow ef(state);
+//   cout << state->coefficients.matrix.rows() << endl;
+//   cout << state->coefficients.matrix.cols() << endl;
+//   cout << state->patterns.matrix.rows() << endl;
+//   cout << state->patterns.matrix.cols() << endl;
+
+
+  cachedError = ef.error();
 	cout << "montecarlo\t" << iterations << "\t" << cachedError/state->expression.size() << endl;
 ////
     string out = "montecarlo" + to_string(iterations) + ".png";

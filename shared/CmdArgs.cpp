@@ -43,8 +43,9 @@ string CmdArgs::errors(){
 bool CmdArgs::wasFatal(){
 	for(auto p : arglist){
 		Argument a = p.second;
-		if(a.asked && !a.found)
+		if(a.asked && !a.found) {
 			return true;
+		}
 	}
 	return false;
 }

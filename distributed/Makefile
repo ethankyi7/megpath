@@ -1,5 +1,5 @@
 CC=mpic++
-CFLAGS=-O3 -c -Wfatal-errors -std=c++11 -I../shared/
+CFLAGS=-O3 -c -Wfatal-errors -std=c++11 -I../shared/ -I/usr/lib/x86_64-linux-gnu/openmpi/include
 LDFLAGS=-L../shared/ 
 LIBS=-lnmf -lpng
 VPATH = /usr/lib64/openmpi/bin

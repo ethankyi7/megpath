@@ -12,6 +12,8 @@ using namespace std;
 int main(){
 	ArgFile args;
 
+	cout << "something worked" << endl;
+
 	args.fromString("analysis = default\nmax_runs = 1000\ndebug = false\nstart_error = 0.2\nend_error = 0.001\nstart_prob = 0.67\nend_prob = 0.1\nstats = none\nanneal_cut_off = 1.5\ndefault_filename = mixed.csv\ndefault_patterns = {0,0,0,0,0}\ndefault_origin = {1,1}\ndefault_directory = ../testing/csv/\ndefault_controls = {0,0,0,0,0}\nprint_runs = 1000\ninterrupt_runs = 1000\ndefault_ids = {0,0,0,0,0}");
 	args.load("tests.txt");
 	args.load("ovwrt.txt");
@@ -25,18 +27,21 @@ int main(){
 
 	cout << "Get the argument for time: \n";
 	Value val = args.getArgument("time");
-	cout << val.asString() << "\n\n";
+	string out = val;
+	cout << out << "\n\n";
 
 	cout << "Vector of ints: \n";
 	if(args.isArgument("vecInts")){
 		val = args.getArgument("vecInts");
 	}
 	cout << "[ ";
-	for(int i = 0; i < val.asVector().size(); ++i){
-		if(i != val.asVector().size()-1){
-			cout << val.asVector()[i].asInt() << ",";
+	vector<int> ints = val;
+	for(int i = 0; i < ints.size(); ++i){
+		int currInt = ints[i];
+		if(i != ints.size()-1){
+			cout << currInt << ",";
 		}else{
-			cout << val.asVector()[i].asInt();
+			cout << currInt;
 		}
 	}
 	cout << " ]\n\n";
@@ -46,11 +51,13 @@ int main(){
 		val = args.getArgument("vecDoubles");
 	}
 	cout << "[ ";
-	for(int i = 0; i < val.asVector().size(); ++i){
-		if(i != val.asVector().size()-1){
-			cout << val.asVector()[i].asDouble() << ",";
+	vector<double> doubles;
+	for(int i = 0; i < doubles.size(); ++i){
+		double currDouble = doubles[i];
+		if(i != doubles.size()-1){
+			cout << currDouble << ",";
 		}else{
-			cout << val.asVector()[i].asDouble();
+			cout << currDouble;
 		}
 	}
 	cout << " ]\n\n";
@@ -60,11 +67,13 @@ int main(){
 		val = args.getArgument("vecStrings");
 	}
 	cout << "[ ";
-	for(int i = 0; i < val.asVector().size(); ++i){
-		if(i != val.asVector().size()-1){
-			cout << val.asVector()[i].asString() << ",";
+	vector<string> strings;
+	for(int i = 0; i < strings.size(); ++i){
+		string currString = strings[i];
+		if(i != strings.size()-1){
+			cout << currString << ",";
 		}else{
-			cout << val.asVector()[i].asString();
+			cout << currString;
 		}
 	}
 	cout << " ]\n\n";

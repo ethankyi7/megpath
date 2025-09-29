@@ -11,7 +11,7 @@ vector<vector<Value> > CSVFile::readCSV(string filename, bool tab){
 	
 	ifstream inFile;
 	inFile.open(filename);
-
+	cout << "Trying to open: " << filename << endl;
 	if(inFile.fail()){
 		cout << "CSVFile could not be opened!\n";
 		exit(-1);

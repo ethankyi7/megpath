@@ -18,6 +18,7 @@ int main(int argc, char** argv){
 		exit(1);
 	}
 	Analysis* a = new Analysis();
+	cout << argFile << endl;
 	a->load(argFile);
 	int runTime = args.getAsInt("rt", "-1");
 	if(runTime != -1){

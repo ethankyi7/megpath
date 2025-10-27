@@ -423,6 +423,9 @@ bool State::load(string argFileName){
 	expression = MatrixXd(ROWS,COLUMNS);
 	expression = MatrixXd::Zero(ROWS,COLUMNS);
 
+	//cout << "this is at least read" << endl;
+	//cout << "expression: \n" << expression << endl;
+
 	if(columns.size() != controls.size() && args.isArgument(analysis + "controls")){
 		cout << "Columns and controls must be the same size.";
 		return false;

@@ -12,15 +12,14 @@
 # 	outfile << "test_columns = [0,1,2,3,4]\n";
 ###
 
-with open('pool1_arguments.txt', 'w') as file:
-    file.write("analysis = \"pool1\"\n")
+with open('pool_arguments.txt', 'w') as file:
+    file.write("analysis = \"pool\"\n")
     file.write("stats = \"all\"\n")
     file.write("max_runs = 40000\n")
     file.write("print_runs = 10000\n")
-    file.write("pool1_filename = \"../data/pool1_output.csv\"\n")
-    file.write("pool1_origin = [0,0] \n")
-    file.write("test_directory = \"results\"\n")
-    testCols = []
-    for i in range(3903):
-        testCols.append(i)
-    file.write("pool1_columns = " + str(testCols) + "\n")
+    file.write("pool_filename = \"../data/pool_output.csv\"\n")
+    file.write("pool_origin = [0,0] \n")
+    file.write("pool_patterns = [\"\",\"\",\"\"]\n")
+    file.write("pool_directory = \"pool_results\"\n")
+    testCols = [i for i in range(20)]
+    file.write("pool_columns = [" + ",".join(str(i) for i in testCols) + "]\n")

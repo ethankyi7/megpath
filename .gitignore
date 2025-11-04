@@ -9,3 +9,4 @@ pathapp
 *.png
 workingHosts
 data/venv/
+.Renviron

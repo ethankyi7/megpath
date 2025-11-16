@@ -40,69 +40,61 @@ poolOnePBMC.htos <- as.matrix(poolOnePBMC.htos[, joint.bcs])
 poolTwoPBMC.umis <- poolTwoPBMC.umis[, joint2.bcs]
 poolTwoPBMC.htos <- as.matrix(poolTwoPBMC.htos[, joint2.bcs])
 
-poolOnePBMC.hashtags <- CreateSeuratObject(counts = Matrix::Matrix(as.matrix(poolOnePBMC.umis), sparse = T))
-poolTwoPBMC.hashtags <- CreateSeuratObject(counts = Matrix::Matrix(as.matrix(poolTwoPBMC.umis), sparse = T))
+poolOnePBMC <- CreateSeuratObject(counts = poolOnePBMC.umis)
+poolTwoPBMC <- CreateSeuratObject(counts = poolTwoPBMC.umis)
 
-# poolOnePBMC.umis[["percent.mt"]] <- PercentageFeatureSet(merged_pbmc, pattern = "^MT-")
-# poolOnePBMC_filterd <- subset(
-#     poolOnePBMC.umis,
-#     subset = nFeature_RNA >= 300 & nFeature_RNA < 7500, min_cells >= 3, percent.mt > 7.5
-# )
+poolOnePBMC[["HTO"]] <- CreateAssayObject(counts = poolOnePBMC.htos)
+poolOnePBMC[["percent.mt"]] <- PercentageFeatureSet(poolOnePBMC, pattern = "^MT-")
+poolOnePBMC_filtered <- subset(
+    poolOnePBMC,
+    subset = nFeature_RNA >= 300 & nFeature_RNA < 7500 & percent.mt < 7.5
+)
 
+poolTwoPBMC[["HTO"]] <- CreateAssayObject(counts = poolTwoPBMC.htos)
+poolTwoPBMC[["percent.mt"]] <- PercentageFeatureSet(poolTwoPBMC, pattern = "^MT-")
+poolTwoPBMC_filtered <- subset(
+    poolTwoPBMC,
+    subset = nFeature_RNA >= 300 & nFeature_RNA < 7500 & percent.mt < 7.5
+)
 
-poolOnePBMC.hashtags[["HTO"]] <- CreateAssayObject(counts = poolOnePBMC.htos)
-poolTwoPBMC.hashtags[["HTO"]] <- CreateAssayObject(counts = poolTwoPBMC.htos)
+poolOnePBMC_filtered <- NormalizeData(poolOnePBMC_filtered, assay = "HTO", normalization.method = "CLR")
+poolTwoPBMC_filtered <- NormalizeData(poolTwoPBMC_filtered, assay = "HTO", normalization.method = "CLR")
 
-poolOnePBMC.hashtags <- RenameCells(poolOnePBMC.hashtags, add.cell.id = c("P1"))
-poolTwoPBMC.hashtags <- RenameCells(poolTwoPBMC.hashtags, add.cell.id = c("P2"))
-
-merged_pbmc <- merge(x = poolOnePBMC.hashtags, y = poolTwoPBMC.hashtags)
-
-merged_pbmc <- NormalizeData(merged_pbmc, assay = "HTO", normalization.method = "CLR")
-
-merged_pbmc <- HTODemux(
-    merged_pbmc, 
-    assay = "HTO", 
+poolOnePBMC_filtered <- HTODemux(
+    poolOnePBMC_filtered,
+    assay = "HTO",
     positive.quantile = 0.99,
-    kfunc = 'clara'   
+    kfunc = 'clara'
 )
 
-table(merged_pbmc$HTO_classification.global)
-table(merged_pbmc$hash.ID)
-#RidgePlot(merged_pbmc, assay = "HTO", features = rownames(merged_pbmc[["HTO"]])[1:2], ncol = 2)
-
-doublet_cells <- subset(merged_pbmc, subset = HTO_classification.global == "Doublet")
-max_id <- doublet_cells$HTO_maxID
-second_id <- doublet_cells$HTO_secondID
-
-doublet_combinations <- sapply(1:length(max_id), function(i) {
-    tags <- sort(c(max_id[i], second_id[i]))
-    paste(tags, collapse = " + ")
-})
-
-doublet_cells$doublet_origin <- doublet_combinations
-table(doublet_cells$doublet_origin)
-
-merged_pbmc[["percent.mt"]] <- PercentageFeatureSet(merged_pbmc, pattern = "^MT-")
-VlnPlot(merged_pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-
-merged_pbmc_filtered <- subset(
-    merged_pbmc, 
-    subset = nFeature_RNA > 300 & nFeature_RNA < 7500 & percent.mt < 7.5
+poolTwoPBMC_filtered <- HTODemux(
+    poolTwoPBMC_filtered,
+    assay = "HTO",
+    positive.quantile = 0.99,
+    kfunc = 'clara'
 )
 
-table(merged_pbmc_filtered$HTO_classification.global)
-#scrublet time
+print("Pool One")
+table(poolOnePBMC_filtered$HTO_classification.global)
+table(poolOnePBMC_filtered$hash.ID)
+
+print("Pool Two")
+table(poolTwoPBMC_filtered$HTO_classification.global)
+table(poolTwoPBMC_filtered$hash.ID)
+
 use_virtualenv(Sys.getenv("ENV_PATH"), required = TRUE)
-scrublet <- import("scrublet")
+scr <- import("scrublet")
 
-merged_pbmc_filtered <- JoinLayers(merged_pbmc_filtered, assay = "RNA")
-counts_matrix <- LayerData(merged_pbmc_filtered, assay = "RNA", layer = "counts")
+doublet_cells <- subset(poolOnePBMC_filtered, subset = HTO_classification.global == "Doublet")
+doublet_cells1 <- subset(poolTwoPBMC_filtered, subset = HTO_classification.global == "Doublet")
+
+poolOnePBMC_filtered <- JoinLayers(poolOnePBMC_filtered, assay = "RNA")
+counts_matrix <- LayerData(poolOnePBMC_filtered, assay = "RNA", layer = "counts")
 counts_matrix_t <- t(as.matrix(counts_matrix))
 
 python_counts_matrix <- r_to_py(counts_matrix_t)
 
-scrub <- scrublet$Scrublet(
+scrub <- scr$Scrublet(
     python_counts_matrix,
     expected_doublet_rate = 0.06
 )
@@ -111,32 +103,52 @@ results <- scrub$scrub_doublets(min_counts = 2, min_cells = 3, min_gene_variabil
 doublet_scores <- py_to_r(results[[1]]) 
 predicted_doublets <- py_to_r(results[[2]])
 
-merged_pbmc_filtered <- AddMetaData(
-    merged_pbmc_filtered, 
+poolOnePBMC_filtered <- AddMetaData(
+    poolOnePBMC_filtered, 
     metadata = doublet_scores, 
     col.name = "scrublet_score"
 )
 
-final_cells_filtered <- subset(merged_pbmc_filtered, subset = scrublet_score < 0.2)
+final_poolOne <- subset(poolOnePBMC_filtered, subset = scrublet_score < 0.2)
+cells_removed_scrublet <- ncol(poolOnePBMC_filtered) - ncol(final_poolOne)
 
-cells_removed_scrublet <- ncol(merged_pbmc_filtered) - ncol(final_cells_filtered)
-
-print(paste("Cells before Scrublet filter:", ncol(merged_pbmc_filtered)))
+print("Pool One")
+print(paste("Cells before Scrublet filter:", ncol(poolOnePBMC_filtered)))
 print(paste("Cells removed by Scrublet (score >= 0.2):", cells_removed_scrublet))
-print(paste("Final high-quality cells remaining:", ncol(final_cells_filtered)))
+print(paste("Final high-quality cells remaining:", ncol(final_poolOne)))
 
-# final_cells_filtered <- NormalizeData(final_cells_filtered, assay = "HTO", normalization.method = "CLR")
-# final_cells_filtered <- HTODemux(
-#     final_cells_filtered, 
-#     assay = "HTO", 
-#     positive.quantile = 0.99,
-#     kfunc = 'clara'
-# )
 
-# table(final_cells_filtered$HTO_classification.global)
-# table(final_cells_filtered$hash.ID)
+poolTwoPBMC_filtered <- JoinLayers(poolTwoPBMC_filtered, assay = "RNA")
+count_matrix1 <- LayerData(poolTwoPBMC_filtered, assay = "RNA", layer = "counts")
+count_matrix1_t <- t(as.matrix(count_matrix1))
 
-final_cells_filtered$timepoint <- final_cells_filtered$HTO_maxID
+python_counts_matrix1 <- r_to_py(count_matrix1_t)
+scrub1 <- scr$Scrublet(
+    python_counts_matrix1,
+    expected_doublet_rate = 0.06
+)
+
+results1 <- scrub1$scrub_doublets(min_counts = 2, min_cells = 3, min_gene_variability_pctl = 85, n_prin_comps = 30L)
+doublet_scores <- py_to_r(results1[[1]]) 
+predicted_doublets <- py_to_r(results1[[2]])
+
+poolTwoPBMC_filtered <- AddMetaData(
+    poolTwoPBMC_filtered, 
+    metadata = doublet_scores, 
+    col.name = "scrublet_score"
+)
+
+final_poolTwo <- subset(poolTwoPBMC_filtered, subset = scrublet_score < 0.2)
+cells_removed_scrublet <- ncol(poolTwoPBMC_filtered) - ncol(final_poolTwo)
+
+print("Pool Two")
+print(paste("Cells before Scrublet filter:", ncol(poolTwoPBMC_filtered)))
+print(paste("Cells removed by Scrublet (score >= 0.2):", cells_removed_scrublet))
+print(paste("Final high-quality cells remaining:", ncol(final_poolTwo)))
+
+
+final_poolOne$timepoint <- final_poolOne$HTO_maxID
+final_poolTwo$timepoint <- final_poolTwo$HTO_maxID
 
 tag_to_sample_map <- c(
     "HTO1-GTCAACTCTTTAGCG" = "W0",
@@ -145,10 +157,42 @@ tag_to_sample_map <- c(
     "HTO4-AGTAAGTTCAGCGTA" = "W9"
 )
 
-final_cells_filtered$timepoint <- factor(
-    final_cells_filtered$timepoint, 
+final_poolOne$timepoint <- factor(
+    final_poolOne$timepoint, 
     levels = names(tag_to_sample_map), 
     labels = unname(tag_to_sample_map)
 )
 
-print(table(final_cells_filtered$timepoint))
+print("pool One")
+print(table(final_poolOne$timepoint))
+
+
+final_poolTwo$timepoint <- factor(
+    final_poolTwo$timepoint,
+    levels = names(tag_to_sample_map),
+    labels = unname(tag_to_sample_map)
+)
+print("pool Two")
+print(table(final_poolTwo$timepoint))
+
+print(nrow(LayerData(final_poolOne, assay = "RNA", layer = "counts")))
+print(nrow(LayerData(final_poolTwo, assay = "RNA", layer = "counts")))
+
+final_poolOne <- RenameCells(final_poolOne, add.cell.id = c("P1"))
+final_poolTwo <- RenameCells(final_poolTwo, add.cell.id = c("P2"))
+
+merged <- merge(x = final_poolOne, y = final_poolTwo)
+merged <- JoinLayers(merged, assay = "RNA")
+
+genes.use <- rownames(merged)[rowSums(GetAssayData(merged, assay = "RNA", layer = "counts") > 0) >= 3]
+merged <- subset(merged, features = genes.use)
+print(table(merged$timepoint))
+print(nrow(LayerData(merged, assay = "RNA", layer = "counts")))
+print(table(merged$HTO_classification.global))
+
+# merged <- NormalizeData(merged)
+# merged <- ScaleData(merged)
+# merged <- FindVariableFeatures(merged, selection.method = "vst", nfeatures = 10000)
+# merged <- RunPCA(merged, features = VariableFeatures(object = merged))
+# merged <- RunUMAP(merged, dims = 1:10)
+# DimPlot(merged, reduction = "umap", group.by = "HTO_classification.global")

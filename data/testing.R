@@ -3,92 +3,92 @@ library(ggplot2)
 library(dplyr)
 library(Matrix)
 
-poolOneData <- ReadMtx(
-    mtx = "genePool1/GSE213902_MQpool1_matrix.mtx.gz",
-    cells = "genePool1/GSE213902_MQpool1_barcodes.tsv.gz",
-    features = "genePool1/GSE213902_MQpool1_features.tsv.gz",
-)
+# poolOneData <- ReadMtx(
+#     mtx = "genePool1/GSE213902_MQpool1_matrix.mtx.gz",
+#     cells = "genePool1/GSE213902_MQpool1_barcodes.tsv.gz",
+#     features = "genePool1/GSE213902_MQpool1_features.tsv.gz",
+# )
 
-poolTwoData <- ReadMtx(
-    mtx = "genePool2/GSE213902_MQpool2_matrix.mtx.gz",
-    cells = "genePool2/GSE213902_MQpool2_barcodes.tsv.gz",
-    features = "genePool2/GSE213902_MQpool2_features.tsv.gz",
-)
+# poolTwoData <- ReadMtx(
+#     mtx = "genePool2/GSE213902_MQpool2_matrix.mtx.gz",
+#     cells = "genePool2/GSE213902_MQpool2_barcodes.tsv.gz",
+#     features = "genePool2/GSE213902_MQpool2_features.tsv.gz",
+# )
 
-poolOneHTO <- ReadMtx(
-    mtx =  "sra/poolOne/umi_count/matrix.mtx.gz",
-    cells = "sra/poolOne/umi_count/barcodes.tsv.gz",
-    features = "sra/poolOne/umi_count/features.tsv.gz",
-    feature.column = 1
-)
+# poolOneHTO <- ReadMtx(
+#     mtx =  "sra/poolOne/umi_count/matrix.mtx.gz",
+#     cells = "sra/poolOne/umi_count/barcodes.tsv.gz",
+#     features = "sra/poolOne/umi_count/features.tsv.gz",
+#     feature.column = 1
+# )
 
-poolTwoHTO <- ReadMtx(
-    mtx =  "sra/poolTwo/umi_count/matrix.mtx.gz",
-    cells = "sra/poolTwo/umi_count/barcodes.tsv.gz",
-    features = "sra/poolTwo/umi_count/features.tsv.gz",
-    feature.column = 1
-)
+# poolTwoHTO <- ReadMtx(
+#     mtx =  "sra/poolTwo/umi_count/matrix.mtx.gz",
+#     cells = "sra/poolTwo/umi_count/barcodes.tsv.gz",
+#     features = "sra/poolTwo/umi_count/features.tsv.gz",
+#     feature.column = 1
+# )
 
-poolOneHTO <- poolOneHTO[rownames(poolOneHTO) != "unmapped", ]
-poolTwoHTO <- poolTwoHTO[rownames(poolTwoHTO) != "unmapped", ]
+# poolOneHTO <- poolOneHTO[rownames(poolOneHTO) != "unmapped", ]
+# poolTwoHTO <- poolTwoHTO[rownames(poolTwoHTO) != "unmapped", ]
 
-colnames(poolOneData) <- gsub("-1$", "", colnames(poolOneData))
-colnames(poolTwoData) <- gsub("-1$", "", colnames(poolTwoData))
+# colnames(poolOneData) <- gsub("-1$", "", colnames(poolOneData))
+# colnames(poolTwoData) <- gsub("-1$", "", colnames(poolTwoData))
 
-#find overlapping barcodes in hto and genome expression (common cells)
-poolOneBarcodes <- intersect(colnames(poolOneData), colnames(poolOneHTO))
-poolTwoBarcodes <- intersect(colnames(poolTwoData), colnames(poolTwoHTO))
-#check for how many were removed
-removed_one <- length(colnames(poolOneData)) - length(poolOneBarcodes)
-removed_two <- length(colnames(poolTwoData)) - length(poolTwoBarcodes)
-print(paste("removed from pool one: ", removed_one))
-print(paste("removed from pool two: ", removed_two))
+# #find overlapping barcodes in hto and genome expression (common cells)
+# poolOneBarcodes <- intersect(colnames(poolOneData), colnames(poolOneHTO))
+# poolTwoBarcodes <- intersect(colnames(poolTwoData), colnames(poolTwoHTO))
+# #check for how many were removed
+# removed_one <- length(colnames(poolOneData)) - length(poolOneBarcodes)
+# removed_two <- length(colnames(poolTwoData)) - length(poolTwoBarcodes)
+# print(paste("removed from pool one: ", removed_one))
+# print(paste("removed from pool two: ", removed_two))
 
-poolOneData <- poolOneData[, poolOneBarcodes]
-poolOneHTO <- as.matrix(poolOneHTO[, poolOneBarcodes])
-poolTwoData <- poolTwoData[, poolTwoBarcodes]
-poolTwoHTO <- as.matrix(poolTwoHTO[, poolTwoBarcodes])
+# poolOneData <- poolOneData[, poolOneBarcodes]
+# poolOneHTO <- as.matrix(poolOneHTO[, poolOneBarcodes])
+# poolTwoData <- poolTwoData[, poolTwoBarcodes]
+# poolTwoHTO <- as.matrix(poolTwoHTO[, poolTwoBarcodes])
 
-poolOne <- CreateSeuratObject(counts = poolOneData)
-poolOne[["percent.mt"]] <- PercentageFeatureSet(poolOne, pattern = "^MT-")
-poolOne[["HTO"]] <- CreateAssayObject(counts = poolOneHTO)
-poolTwo <- CreateSeuratObject(counts = poolTwoData)
-poolTwo[["percent.mt"]] <- PercentageFeatureSet(poolTwo, pattern = "^MT-")
-poolTwo[['HTO']] <- CreateAssayObject(counts = poolTwoHTO)
+# poolOne <- CreateSeuratObject(counts = poolOneData)
+# poolOne[["percent.mt"]] <- PercentageFeatureSet(poolOne, pattern = "^MT-")
+# poolOne[["HTO"]] <- CreateAssayObject(counts = poolOneHTO)
+# poolTwo <- CreateSeuratObject(counts = poolTwoData)
+# poolTwo[["percent.mt"]] <- PercentageFeatureSet(poolTwo, pattern = "^MT-")
+# poolTwo[['HTO']] <- CreateAssayObject(counts = poolTwoHTO)
 
-poolOne <- NormalizeData(poolOne, assay = "HTO", normalization.method = "CLR")
-poolTwo <- NormalizeData(poolTwo, assay = "HTO", normalization.method = "CLR")
+# poolOne <- NormalizeData(poolOne, assay = "HTO", normalization.method = "CLR")
+# poolTwo <- NormalizeData(poolTwo, assay = "HTO", normalization.method = "CLR")
 
-poolOne <- HTODemux(
-    poolOne,
-    assay = "HTO",
-    positive.quantile = 0.995,
-    kfunc = 'clara'
-)
+# poolOne <- HTODemux(
+#     poolOne,
+#     assay = "HTO",
+#     positive.quantile = 0.995,
+#     kfunc = 'clara'
+# )
 
-poolTwo <- HTODemux(
-    poolTwo,
-    assay = "HTO",
-    positive.quantile = 0.995,
-    kfunc = 'clara'
-)
+# poolTwo <- HTODemux(
+#     poolTwo,
+#     assay = "HTO",
+#     positive.quantile = 0.995,
+#     kfunc = 'clara'
+# )
 
-pooled <- merge(x = poolOne, y = poolTwo, add.cell.ids = c("P1", "P2"))
-print(pooled)
-# #FeatureScatter(pooled, feature2 = "percent.mt", feature1 = "nFeature_RNA")
+# pooled <- merge(x = poolOne, y = poolTwo, add.cell.ids = c("P1", "P2"))
+# print(pooled)
+# # #FeatureScatter(pooled, feature2 = "percent.mt", feature1 = "nFeature_RNA")
 
-pooled <- JoinLayers(pooled, assay = "RNA", layer = "counts")
-counts <- GetAssayData(pooled, assay = "RNA", layer = "counts")
+# pooled <- JoinLayers(pooled, assay = "RNA", layer = "counts")
+# counts <- GetAssayData(pooled, assay = "RNA", layer = "counts")
 
-# writeMM(counts, "counts.mtx")
-# write.table(rownames(counts), "genes.tsv", quote = FALSE, row.names = FALSE, col.names = FALSE)
-# write.table(colnames(counts), "barcodes.tsv", quote = FALSE, row.names = FALSE, col.names = FALSE)
+# # writeMM(counts, "counts.mtx")
+# # write.table(rownames(counts), "genes.tsv", quote = FALSE, row.names = FALSE, col.names = FALSE)
+# # write.table(colnames(counts), "barcodes.tsv", quote = FALSE, row.names = FALSE, col.names = FALSE)
 
-scrub <- read.csv("scrublet_results.csv")
-#print(scrub[match(colnames(pooled), scrub$barcode), ])
-#print(scrub$doublet_score)
-pooled[["doublet_score"]] <- scrub$doublet_score
-#summary(pooled$doublet_score)
+# scrub <- read.csv("scrublet_results.csv")
+# #print(scrub[match(colnames(pooled), scrub$barcode), ])
+# #print(scrub$doublet_score)
+# pooled[["doublet_score"]] <- scrub$doublet_score
+# #summary(pooled$doublet_score)
 
 # df <- pooled@meta.data
 # df <- mutate (

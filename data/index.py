@@ -12,14 +12,15 @@
 # 	outfile << "test_columns = [0,1,2,3,4]\n";
 ###
 
-with open('pool_arguments.txt', 'w') as file:
-    file.write("analysis = \"pool\"\n")
+with open('clusterFourLT_arguments.txt', 'w') as file:
+    file.write("analysis = \"clusterFourLT\"\n")
     file.write("stats = \"all\"\n")
     file.write("max_runs = 40000\n")
     file.write("print_runs = 10000\n")
-    file.write("pool_filename = \"../data/pool_output.csv\"\n")
-    file.write("pool_origin = [0,0] \n")
-    file.write("pool_patterns = [\"\",\"\",\"\"]\n")
-    file.write("pool_directory = \"pool_results\"\n")
-    testCols = [i for i in range(20)]
-    file.write("pool_columns = [" + ",".join(str(i) for i in testCols) + "]\n")
+    file.write("clusterFourLT_filename = \"../data/cluster_four.csv\"\n")
+    file.write("clusterFourLT_origin = [0,0] \n")
+    file.write("clusterFourLT_patterns = [\"patternFourLT\",\"\",\"\"]\n")
+    file.write("clusterFourLT_directory = \"clustersLT\"\n")
+    testCols = [i for i in range(4)]
+    file.write("clusterFourLT_columns = [" + ",".join(str(i) for i in testCols) + "]\n")
+    file.write("patternFourLT = [0.009090,0.493705,0.017601,0.024007]")

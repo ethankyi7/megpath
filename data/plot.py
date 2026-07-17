@@ -111,14 +111,14 @@ import io
 # plt.show()
 
 
-clonotype_df = pd.read_csv("kmeans_clusters.csv")
-clonotype_df = clonotype_df.drop_duplicates(subset=['TCRB.clonotype'])
-clonotype_map = clonotype_df[["TCRB.clonotype", "cluster"]]
+# clonotype_df = pd.read_csv("kmeans_clusters.csv")
+# clonotype_df = clonotype_df.drop_duplicates(subset=['TCRB.clonotype'])
+# clonotype_map = clonotype_df[["TCRB.clonotype", "cluster"]]
 
-print((clonotype_map['cluster'] == 1).sum())
-print((clonotype_map['cluster'] == 2).sum())
-print((clonotype_map['cluster'] == 3).sum())
-print((clonotype_map['cluster'] == 4).sum())
+# print((clonotype_map['cluster'] == 1).sum())
+# print((clonotype_map['cluster'] == 2).sum())
+# print((clonotype_map['cluster'] == 3).sum())
+# print((clonotype_map['cluster'] == 4).sum())
 
 # print(clonotype_map)
 # clonotype_map.to_csv("clonotype_map.csv", index=None)
@@ -150,26 +150,26 @@ def plot_data(pattern, data, cluster):
         plt.annotate(f'{j:.2f}', (i,j), textcoords="offset points", xytext=(15,10), ha='center')
     plt.show()
 
-plot_data(patternOne, nmfPatternOne, 1)
-plot_data(patternTwo, nmfPatternTwo, 2)
-plot_data(patternThree, nmfPatternThree, 3)
-plot_data(patternFour, nmfPatternFour, 4)
+# plot_data(patternOne, nmfPatternOne, 1)
+# plot_data(patternTwo, nmfPatternTwo, 2)
+# plot_data(patternThree, nmfPatternThree, 3)
+# plot_data(patternFour, nmfPatternFour, 4)
 
-# lfc1 = [0.284495, 0.436276, 0.407195, 0.434992]
-# lfc_pat1 = [0.5000000, 0.8048910, 0.6845230, 0.7166605]
-# plot_data(lfc_pat1, lfc1, 1)
+lfc1 = [0.231723, 0.438537, 0.434193, 0.417186]
+lfc_pat1 = [0.0000000, 1.0000000, 0.3563981, 0.4796209]
+plot_data(lfc_pat1, lfc1, 1)
 
-# lfc2 = [1.11023,2.26023,0.000230124,1.72023]
-# lfc_pat2 = [0.5000000, 0.6113981, 0.6717390, 0.7262386]
-# plot_data(lfc_pat2, lfc2, 2)
+lfc2 = [0.527994, 0.26754, 0.376936, 0.378721]
+lfc_pat2 = [0.0, 0.4394, 0.6787, 1.0]
+plot_data(lfc_pat2, lfc2, 2)
 
-# lfc3 = [0.3729, 0.20633, 0.387112, 0.39225]
-# lfc_pat3 = [0.5000000, 0, 0.4865699, 0.4801746]
-# plot_data(lfc_pat3, lfc3, 3)
+lfc3 = [0.460237, 0.267471, 0.461853, 0.462834]
+lfc_pat3 = [1.0, 0.0, 0.9111, 0.8716]
+plot_data(lfc_pat3, lfc3, 3)
 
-# lfc4 = [6.13,1.41,2.68469e-06,0.960003]
-# lfc_pat4 = [0.500000, 1.112680, 0.596319, 0.641227]
-# plot_data(lfc_pat4, lfc4, 4)
+lfc4 = [0.418861, 0.416119, 0.450006, 0.217711]
+lfc_pat4 = [0.0, 1.0, 0.0138, 0.0241]
+plot_data(lfc_pat4, lfc4, 4)
 
 c1 = [1.45, 12.0, 5.21, 6.51]
 c2 = [0.0371,0.803,1.22,1.78]
